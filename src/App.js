@@ -3,33 +3,15 @@ import Button from "./components/Button";
 import FriendList from "./components/friendlist";
 import FormAddFriend from "./components/formaddfriend";
 import FormSplitBills from "./components/splitScreen";
-
-const initialFriends = [
-  {
-    id: 118836,
-    name: "Misty",
-    image: "https://i.pravatar.cc/48?u=118836=",
-    balance: -7,
-  },
-  {
-    id: 933372,
-    name: "May",
-    image: "https://i.pravatar.cc/48?u=933372",
-    balance: 20,
-  },
-  {
-    id: 499476,
-    name: "Ash",
-    image: "https://i.pravatar.cc/48?u=499476",
-    balance: 0,
-  },
-];
-
+import { initialFriends } from "./data/initialdata";
 export default function App() {
   //this is for button to add a friend
   const [onAddFriend, SetonAddFriend] = React.useState(false);
   //this is for ui to change state when we click the button
   const [friends, setFriends] = React.useState(initialFriends);
+
+  //creating state for select button
+  const [selectedFriend, setSelectedFriend] = React.useState(null); //null means no friend is selected
 
   function handleaddFriend(newFriend) {
     setFriends((item) => [...item, newFriend]);
@@ -43,10 +25,34 @@ export default function App() {
     SetonAddFriend((prev) => !prev);
   }
 
+  function handleSelectedFriend(friend) {
+    setSelectedFriend((current) =>
+      current && current.id === friend.id ? null : friend
+    );
+  }
+
+  //split bill logic
+  function handleSplitBill(value) {
+    //console.log(value);
+    setFriends((friends) =>
+      friends.map((friend) =>
+        friend.id === selectedFriend.id
+          ? { ...friend, balance: friend.balance + value }
+          : friend
+      )
+    );
+    setSelectedFriend(null); //this will close the form after splitting the bill
+  }
+
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendList friends={friends} />
+        <FriendList
+          friends={friends}
+          select={handleSelectedFriend}
+          currentlyselected={selectedFriend}
+        />
+
         {onAddFriend && <FormAddFriend onClick={handleaddFriend} />}
 
         <Button Click={handleshowAddFriend}>
@@ -54,7 +60,12 @@ export default function App() {
         </Button>
       </div>
 
-      <FormSplitBills />
+      {selectedFriend && (
+        <FormSplitBills
+          details={selectedFriend}
+          onSplitBill={handleSplitBill}
+        />
+      )}
     </div>
   );
 }
