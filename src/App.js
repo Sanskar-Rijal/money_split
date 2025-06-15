@@ -41,7 +41,7 @@ export default function App() {
           : friend
       )
     );
-    setSelectedFriend(null); //this will close the form after splitting the bill
+    //setSelectedFriend(null); //this will close the form after splitting the bill
   }
 
   return (
@@ -64,6 +64,7 @@ export default function App() {
         <FormSplitBills
           details={selectedFriend}
           onSplitBill={handleSplitBill}
+          key={selectedFriend.id}
         />
       )}
     </div>
